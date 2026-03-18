@@ -68,4 +68,15 @@ public class Order {
     public void addProduct(Product product) {
         this.getProducts().add(product);
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", customer=" + customer +
+                ", status=" + status +
+                ", orderDate=" + orderDate +
+                ", deliveryDate=" + deliveryDate +
+                '}';
+    }
 }

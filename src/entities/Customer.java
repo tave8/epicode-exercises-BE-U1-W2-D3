@@ -21,7 +21,7 @@ public class Customer {
     public String getName() {
         return name;
     }
-    
+
 
     public CustomerTier getTier() {
         return tier;
@@ -29,5 +29,14 @@ public class Customer {
 
     public void setTier(CustomerTier tier) {
         this.tier = tier;
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", tier=" + tier +
+                '}';
     }
 }

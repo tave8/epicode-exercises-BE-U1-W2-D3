@@ -3,5 +3,6 @@ package enums;
 public enum ProductCategory {
     BABY,
     BOY,
-    GIRL
+    GIRL,
+    BOOK
 }
