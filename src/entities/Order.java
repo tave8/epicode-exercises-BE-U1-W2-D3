@@ -73,10 +73,11 @@ public class Order {
     public String toString() {
         return "Order{" +
                 "id=" + id +
-                ", customer=" + customer +
                 ", status=" + status +
                 ", orderDate=" + orderDate +
                 ", deliveryDate=" + deliveryDate +
+                ", products=" + products +
+                ", customer=" + customer +
                 '}';
     }
 }

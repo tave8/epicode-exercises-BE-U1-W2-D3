@@ -9,6 +9,7 @@ import enums.ProductCategory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class Main {
@@ -24,14 +25,32 @@ public class Main {
         // exercise 1
         List<Product> expensiveBooks = getExpensiveBooks(products);
         // exercise 2
-        // List<Order> 
+        List<Order> ordersWithBabyProducts = getOrdersWithBabyProducts(orders);
 
         System.out.println("---- EXPENSIVE BOOKS -----");
         System.out.println(expensiveBooks);
-        // System.out.println("---- ORDERS WITH BABY PRODUCTS");
-        // System.out.println(ordersWithBabyProducts);
+
+        System.out.println("---- ORDERS WITH BABY PRODUCTS");
+        System.out.println(ordersWithBabyProducts);
     }
 
+    static List<Order> getOrdersWithBabyProducts(List<Order> orders) {
+        Stream<Order> ordersStream = orders.stream();
+        Predicate<Product> productIsBabyProduct = product -> product.getCategory().equals(ProductCategory.BABY);
+        Predicate<Order> orderHasAtLeastOneBabyProduct = order -> order.getProducts().stream().anyMatch(productIsBabyProduct);
+        Stream<Order> ordersWithAtLeastOneBabyProduct = ordersStream.filter(orderHasAtLeastOneBabyProduct);
+        // Stream<Order> ordersWithOnlyBabyProducts = ordersWithAtLeastOneBabyProduct.map(order -> {
+
+        // });
+        return ordersWithAtLeastOneBabyProduct.toList();
+    }
+
+    static List<Product> getExpensiveBooks(List<Product> products) {
+        Stream<Product> productsStream = products.stream();
+        Stream<Product> books = productsStream.filter(product -> product.getCategory().equals(ProductCategory.BOOK));
+        Stream<Product> expensiveBooks = books.filter(book -> book.getPrice() > 100);
+        return expensiveBooks.toList();
+    }
 
     /**
      *
@@ -86,10 +105,4 @@ public class Main {
         );
     }
 
-    static List<Product> getExpensiveBooks(List<Product> products) {
-        Stream<Product> productsStream = products.stream();
-        Stream<Product> books = productsStream.filter(product -> product.getCategory().equals(ProductCategory.BOOK));
-        Stream<Product> expensiveBooks = books.filter(book -> book.getPrice() > 100);
-        return expensiveBooks.toList();
-    }
 }
