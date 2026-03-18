@@ -7,6 +7,7 @@ import enums.CustomerTier;
 import enums.OrderStatus;
 import enums.ProductCategory;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -15,9 +16,10 @@ import java.util.stream.Stream;
 public class Main {
     static void main(String[] args) {
         // SAMPLE DATA
+        // TODO 3: cannot use raw List?
         Map<String, List> sampleData = getSampleData();
 
-        // TODO: fix "unchecked assignment"
+        // TODO 2: fix "unchecked assignment"
         List<Product> products = sampleData.get("products");
         List<Order> orders = sampleData.get("orders");
         List<Customer> customers = sampleData.get("customers");
@@ -29,63 +31,82 @@ public class Main {
         // exercise 3
         List<Product> discountedBoyProducts = getDiscountedBoyProducts(products);
         // exercise 4
-        // List<Product> productsBetweenDateRangeOfTier2Customers = getProductsBetweenDateRangeOfTier2Customers(orders);
+        List<Product> productsBetweenDateRangeOfTier2Customers = getProductsBetweenDateRangeOfTier2Customers(orders);
 
         System.out.println("---- EXPENSIVE BOOKS -----");
-        System.out.println(expensiveBooks);
+        for (Product book : expensiveBooks) {
+            System.out.println(book);
+        }
 
         System.out.println();
         System.out.println("---- ORDERS WITH BABY PRODUCTS");
-        System.out.println(ordersWithBabyProducts);
+        for (Order order : ordersWithBabyProducts) {
+            System.out.println(order);
+        }
 
         System.out.println();
         System.out.println("---- DISCOUNTED BOY PRODUCTS ");
-        System.out.println(discountedBoyProducts);
+        for (Product product : discountedBoyProducts) {
+            System.out.println(product);
+        }
 
         System.out.println();
-        // System.out.println("---- PRODUCTS ORDERED BETWEEN DATE RANGE, ORDERED BY TIER 2 CUSTOMERS");
-        // System.out.println(productsBetweenDateRangeOfTier2Customers);
+        System.out.println("---- PRODUCTS ORDERED BETWEEN DATE RANGE, ORDERED BY TIER 2 CUSTOMERS");
+        System.out.println(productsBetweenDateRangeOfTier2Customers);
     }
+
 
     /**
      * Exercise 4
      */
-    // static List<Product> getProductsBetweenDateRangeOfTier2Customers(List<Order> orders) {
-    //     LocalDate startDate = LocalDate.of(2026, 3, 18);
-    //     LocalDate endDate = LocalDate.of(2026, 5, 18);
-    //
-    //     // predicates
-    //     Predicate<Order> isOrderAfterStartDate = order -> order.getOrderDate().isAfter(startDate);
-    //     Predicate<Order> isOrderBeforeEndDate = order -> order.getOrderDate().isBefore(endDate);
-    //     Predicate<Order> isOrderInDateRange = isOrderAfterStartDate.and(isOrderBeforeEndDate);
-    //
-    //     // streams
-    //     Stream<Order> ordersStream = orders.stream();
-    //     Stream<Order> ordersOfTier2Customers = ordersStream.filter(order -> order.getCustomer().getTier().equals(CustomerTier.TWO));
-    //     Stream<Order> ordersBetweenDateRange = ordersOfTier2Customers.filter(isOrderInDateRange);
-    //     // Stream<Product> productsOfOrders = ordersBetweenDateRange.flatMap(order -> order.getProducts());
-    //     //      
-    //
-    // }
+    static List<Product> getProductsBetweenDateRangeOfTier2Customers(List<Order> orders) {
+        LocalDate startDate = LocalDate.of(2026, 3, 18);
+        LocalDate endDate = LocalDate.of(2026, 5, 18);
+
+        // predicates
+        Predicate<Order> isOrderAfterStartDate = order -> order.getOrderDate().isAfter(startDate);
+        Predicate<Order> isOrderBeforeEndDate = order -> order.getOrderDate().isBefore(endDate);
+        Predicate<Order> isOrderInDateRange = isOrderAfterStartDate.and(isOrderBeforeEndDate);
+
+        // streams
+        Stream<Order> ordersStream = orders.stream();
+        Stream<Order> ordersOfTier2Customers = ordersStream.filter(order -> order.getCustomer().getTier().equals(CustomerTier.TWO));
+        Stream<Order> ordersBetweenDateRange = ordersOfTier2Customers.filter(isOrderInDateRange);
+
+        // List<Order> orderList = ordersBetweenDateRange.toList();
+
+        // METHOD 1: for enhanced
+        // List<Product> allProducts = new ArrayList<>();
+        // for (Order order : orderList) {
+        //     allProducts.addAll(order.getProducts());
+        // }
+        //
+        // return allProducts;
+
+        //     METHOD 2:
+        //     1 order -> N products
+        Stream<Product> productsOfOrders = ordersBetweenDateRange.flatMap(order -> order.getProducts().stream());
+
+        return productsOfOrders.toList();
+    }
 
     /**
      * Exercise 3
      */
     static List<Product> getDiscountedBoyProducts(List<Product> products) {
-        Stream<Product> productsStream = products.stream();
-        Stream<Product> boysProducts = productsStream.filter(product -> product.getCategory().equals(ProductCategory.BOY));
-        Stream<Product> discountedBoysProducts = boysProducts.map(currProduct -> {
-            double discountedPrice = currProduct.getPrice() - (currProduct.getPrice() * 0.1);
-            // return a new product with same data 
-            // but discounted price 
-            return new Product(
-                    currProduct.getId(),
-                    currProduct.getName(),
-                    discountedPrice,
-                    currProduct.getCategory()
-            );
-        });
-        return discountedBoysProducts.toList();
+        return products.stream()
+                .filter(product -> product.getCategory().equals(ProductCategory.BOY))
+                .map(currProduct -> {
+                    double discountedPrice = currProduct.getPrice() - (currProduct.getPrice() * 0.1);
+                    // return a new product with same data 
+                    // but discounted price 
+                    return new Product(
+                            currProduct.getId(),
+                            currProduct.getName(),
+                            discountedPrice,
+                            currProduct.getCategory()
+                    );
+                }).toList();
     }
 
     /**
@@ -100,7 +121,7 @@ public class Main {
         Stream<Order> ordersStream = orders.stream();
         Stream<Order> ordersWithAtLeastOneBabyProduct = ordersStream.filter(orderHasAtLeastOneBabyProduct);
 
-        // TODO: 
+        // TODO 1: 
         //      A) for every order that has at least one baby product: all products 
         //      B) for every order that has at least one baby product: only baby products 
 
@@ -166,6 +187,8 @@ public class Main {
         // ***** EDIT ENTITY RELATIONSHIPS
         order1.addProduct(product4);
         order1.addProduct(product3);
+        order2.addProduct(product3);
+        order2.addProduct(product4);
 
         // products
         List<Product> products = List.of(
