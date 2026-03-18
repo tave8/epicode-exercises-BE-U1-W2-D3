@@ -53,16 +53,18 @@ public class Main {
     // static List<Product> getProductsBetweenDateRangeOfTier2Customers(List<Order> orders) {
     //     LocalDate startDate = LocalDate.of(2026, 3, 18);
     //     LocalDate endDate = LocalDate.of(2026, 5, 18);
+    //
     //     // predicates
     //     Predicate<Order> isOrderAfterStartDate = order -> order.getOrderDate().isAfter(startDate);
     //     Predicate<Order> isOrderBeforeEndDate = order -> order.getOrderDate().isBefore(endDate);
     //     Predicate<Order> isOrderInDateRange = isOrderAfterStartDate.and(isOrderBeforeEndDate);
+    //
     //     // streams
     //     Stream<Order> ordersStream = orders.stream();
     //     Stream<Order> ordersOfTier2Customers = ordersStream.filter(order -> order.getCustomer().getTier().equals(CustomerTier.TWO));
     //     Stream<Order> ordersBetweenDateRange = ordersOfTier2Customers.filter(isOrderInDateRange);
     //     // Stream<Product> productsOfOrders = ordersBetweenDateRange.flatMap(order -> order.getProducts());
-    //     //     
+    //     //      
     //
     // }
 
@@ -90,18 +92,37 @@ public class Main {
      * Exercise 2
      */
     static List<Order> getOrdersWithBabyProducts(List<Order> orders) {
-        Stream<Order> ordersStream = orders.stream();
+        // predicates
         Predicate<Product> productIsBabyProduct = product -> product.getCategory().equals(ProductCategory.BABY);
         Predicate<Order> orderHasAtLeastOneBabyProduct = order -> order.getProducts().stream().anyMatch(productIsBabyProduct);
+
+        // streams
+        Stream<Order> ordersStream = orders.stream();
         Stream<Order> ordersWithAtLeastOneBabyProduct = ordersStream.filter(orderHasAtLeastOneBabyProduct);
+
         // TODO: 
         //      A) for every order that has at least one baby product: all products 
         //      B) for every order that has at least one baby product: only baby products 
 
-        // Stream<Order> ordersWithOnlyBabyProducts = ordersWithAtLeastOneBabyProduct.map(order -> {
+        Stream<Order> ordersWithOnlyBabyProducts = ordersWithAtLeastOneBabyProduct.map(currOrder -> {
+            Order newOrder = new Order(
+                    currOrder.getId(),
+                    currOrder.getCustomer(),
+                    currOrder.getStatus(),
+                    currOrder.getOrderDate(),
+                    currOrder.getDeliveryDate()
+            );
+            // add products of current order, to products of new order
+            // add the product only if it's a baby product
+            currOrder.getProducts().forEach(product -> {
+                if (product.getCategory().equals(ProductCategory.BABY)) {
+                    newOrder.addProduct(product);
+                }
+            });
+            return newOrder;
+        });
 
-        // });
-        return ordersWithAtLeastOneBabyProduct.toList();
+        return ordersWithOnlyBabyProducts.toList();
     }
 
     /**
@@ -144,6 +165,7 @@ public class Main {
 
         // ***** EDIT ENTITY RELATIONSHIPS
         order1.addProduct(product4);
+        order1.addProduct(product3);
 
         // products
         List<Product> products = List.of(
