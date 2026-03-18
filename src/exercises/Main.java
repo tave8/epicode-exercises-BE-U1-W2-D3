@@ -26,12 +26,34 @@ public class Main {
         List<Product> expensiveBooks = getExpensiveBooks(products);
         // exercise 2
         List<Order> ordersWithBabyProducts = getOrdersWithBabyProducts(orders);
+        // exercise 3
+        List<Product> discountedBoyProducts = getDiscountedBoyProducts(products);
 
         System.out.println("---- EXPENSIVE BOOKS -----");
         System.out.println(expensiveBooks);
 
         System.out.println("---- ORDERS WITH BABY PRODUCTS");
         System.out.println(ordersWithBabyProducts);
+
+        System.out.println("---- DISCOUNTED BOY PRODUCTS ");
+        System.out.println(discountedBoyProducts);
+    }
+
+    static List<Product> getDiscountedBoyProducts(List<Product> products) {
+        Stream<Product> productsStream = products.stream();
+        Stream<Product> boysProducts = productsStream.filter(product -> product.getCategory().equals(ProductCategory.BOY));
+        Stream<Product> discountedBoysProducts = boysProducts.map(currProduct -> {
+            double discountedPrice = currProduct.getPrice() - (currProduct.getPrice() * 0.1);
+            // return a new product with same data 
+            // but discounted price 
+            return new Product(
+                    currProduct.getId(),
+                    currProduct.getName(),
+                    discountedPrice,
+                    currProduct.getCategory()
+            );
+        });
+        return discountedBoysProducts.toList();
     }
 
     static List<Order> getOrdersWithBabyProducts(List<Order> orders) {
@@ -39,6 +61,10 @@ public class Main {
         Predicate<Product> productIsBabyProduct = product -> product.getCategory().equals(ProductCategory.BABY);
         Predicate<Order> orderHasAtLeastOneBabyProduct = order -> order.getProducts().stream().anyMatch(productIsBabyProduct);
         Stream<Order> ordersWithAtLeastOneBabyProduct = ordersStream.filter(orderHasAtLeastOneBabyProduct);
+        // TODO: 
+        //      A) for every order that has at least one baby product: all products 
+        //      B) for every order that has at least one baby product: only baby products 
+
         // Stream<Order> ordersWithOnlyBabyProducts = ordersWithAtLeastOneBabyProduct.map(order -> {
 
         // });
@@ -66,6 +92,7 @@ public class Main {
         Product product2 = new Product(2, "book2", 12.34, ProductCategory.BOOK);
         Product product3 = new Product(3, "book3", 102.34, ProductCategory.BOOK);
         Product product4 = new Product(4, "baby1", 23, ProductCategory.BABY);
+        Product product5 = new Product(5, "boy1", 100, ProductCategory.BOY);
 
         // ***** CUSTOMERS
         Customer customer1 = new Customer(1, "Giuseppe", CustomerTier.ONE);
@@ -83,7 +110,8 @@ public class Main {
                 product1,
                 product2,
                 product3,
-                product4
+                product4,
+                product5
         );
 
         // customers
