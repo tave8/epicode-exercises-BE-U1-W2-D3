@@ -21,10 +21,15 @@ public class Main {
         List<Order> orders = sampleData.get("orders");
         List<Customer> customers = sampleData.get("customers");
 
-        // ****** EXERCISE 1:
-        //      PRODUCT LIST: BOOK AND PRODUCT PRICE > 100
+        // exercise 1
         List<Product> expensiveBooks = getExpensiveBooks(products);
+        // exercise 2
+        // List<Order> 
+
+        System.out.println("---- EXPENSIVE BOOKS -----");
         System.out.println(expensiveBooks);
+        // System.out.println("---- ORDERS WITH BABY PRODUCTS");
+        // System.out.println(ordersWithBabyProducts);
     }
 
 
@@ -37,21 +42,41 @@ public class Main {
      * }
      */
     static Map<String, List> getSampleData() {
+        // ***** PRODUCTS
+        Product product1 = new Product(1, "book1", 12.34, ProductCategory.BOOK);
+        Product product2 = new Product(2, "book2", 12.34, ProductCategory.BOOK);
+        Product product3 = new Product(3, "book3", 102.34, ProductCategory.BOOK);
+        Product product4 = new Product(4, "baby1", 23, ProductCategory.BABY);
+
+        // ***** CUSTOMERS
+        Customer customer1 = new Customer(1, "Giuseppe", CustomerTier.ONE);
+        Customer customer2 = new Customer(2, "Maria", CustomerTier.ONE);
+
+        // ***** ORDERS
+        Order order1 = new Order(1, customer1, OrderStatus.DELIVERED);
+        Order order2 = new Order(2, customer1, OrderStatus.SHIPPED);
+
+        // ***** EDIT ENTITY RELATIONSHIPS
+        order1.addProduct(product4);
+
         // products
         List<Product> products = List.of(
-                new Product(1, "book1", 12.34, ProductCategory.BOOK),
-                new Product(2, "book2", 12.34, ProductCategory.BOOK),
-                new Product(3, "book3", 102.34, ProductCategory.BOOK)
+                product1,
+                product2,
+                product3,
+                product4
         );
 
         // customers
         List<Customer> customers = List.of(
-                new Customer(1, "Giuseppe", CustomerTier.ONE)
+                customer1,
+                customer2
         );
 
         // orders
         List<Order> orders = List.of(
-                new Order(1, customers.get(0), OrderStatus.DELIVERED)
+                order1,
+                order2
         );
 
         return Map.of(
