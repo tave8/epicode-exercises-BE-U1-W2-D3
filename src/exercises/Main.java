@@ -8,6 +8,7 @@ import enums.OrderStatus;
 import enums.ProductCategory;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -69,25 +70,25 @@ public class Main {
         Predicate<Order> isOrderInDateRange = isOrderAfterStartDate.and(isOrderBeforeEndDate);
 
         // streams
-        Stream<Order> ordersStream = orders.stream();
-        Stream<Order> ordersOfTier2Customers = ordersStream.filter(order -> order.getCustomer().getTier().equals(CustomerTier.TWO));
-        Stream<Order> ordersBetweenDateRange = ordersOfTier2Customers.filter(isOrderInDateRange);
+        Stream<Order> filteredOrders = orders.stream()
+                .filter(order -> order.getCustomer().getTier().equals(CustomerTier.TWO))
+                .filter(isOrderInDateRange);
 
-        // List<Order> orderList = ordersBetweenDateRange.toList();
+        List<Order> orderList = filteredOrders.toList();
 
         // METHOD 1: for enhanced
-        // List<Product> allProducts = new ArrayList<>();
-        // for (Order order : orderList) {
-        //     allProducts.addAll(order.getProducts());
-        // }
-        //
-        // return allProducts;
+        List<Product> allProducts = new ArrayList<>();
+        for (Order order : orderList) {
+            allProducts.addAll(order.getProducts());
+        }
+
+        return allProducts;
 
         //     METHOD 2:
         //     1 order -> N products
-        Stream<Product> productsOfOrders = ordersBetweenDateRange.flatMap(order -> order.getProducts().stream());
-
-        return productsOfOrders.toList();
+        // Stream<Product> productsOfOrders = ordersBetweenDateRange.flatMap(order -> order.getProducts().stream());
+        //
+        // return productsOfOrders.toList();
     }
 
     /**
@@ -117,43 +118,37 @@ public class Main {
         Predicate<Product> productIsBabyProduct = product -> product.getCategory().equals(ProductCategory.BABY);
         Predicate<Order> orderHasAtLeastOneBabyProduct = order -> order.getProducts().stream().anyMatch(productIsBabyProduct);
 
-        // streams
-        Stream<Order> ordersStream = orders.stream();
-        Stream<Order> ordersWithAtLeastOneBabyProduct = ordersStream.filter(orderHasAtLeastOneBabyProduct);
-
-        // TODO 1: 
-        //      A) for every order that has at least one baby product: all products 
-        //      B) for every order that has at least one baby product: only baby products 
-
-        Stream<Order> ordersWithOnlyBabyProducts = ordersWithAtLeastOneBabyProduct.map(currOrder -> {
-            Order newOrder = new Order(
-                    currOrder.getId(),
-                    currOrder.getCustomer(),
-                    currOrder.getStatus(),
-                    currOrder.getOrderDate(),
-                    currOrder.getDeliveryDate()
-            );
-            // add products of current order, to products of new order
-            // add the product only if it's a baby product
-            currOrder.getProducts().forEach(product -> {
-                if (product.getCategory().equals(ProductCategory.BABY)) {
-                    newOrder.addProduct(product);
-                }
-            });
-            return newOrder;
-        });
-
-        return ordersWithOnlyBabyProducts.toList();
+        return orders.stream()
+                .filter(orderHasAtLeastOneBabyProduct)
+                .map(currOrder -> {
+                    Order newOrder = new Order(
+                            currOrder.getId(),
+                            currOrder.getCustomer(),
+                            currOrder.getStatus(),
+                            currOrder.getOrderDate(),
+                            currOrder.getDeliveryDate()
+                    );
+                    // add products of current order, to products of new order
+                    // add the product only if it's a baby product
+                    currOrder.getProducts().forEach(product -> {
+                        if (product.getCategory().equals(ProductCategory.BABY)) {
+                            newOrder.addProduct(product);
+                        }
+                    });
+                    return newOrder;
+                }).toList();
     }
 
     /**
      * Exercise 1
      */
     static List<Product> getExpensiveBooks(List<Product> products) {
-        Stream<Product> productsStream = products.stream();
-        Stream<Product> books = productsStream.filter(product -> product.getCategory().equals(ProductCategory.BOOK));
-        Stream<Product> expensiveBooks = books.filter(book -> book.getPrice() > 100);
-        return expensiveBooks.toList();
+        Predicate<Product> isBook = product -> product.getCategory().equals(ProductCategory.BOOK);
+        Predicate<Product> isExpensive = product -> product.getPrice() > 100;
+        Predicate<Product> isExpensiveBook = isBook.and(isExpensive);
+        return products.stream()
+                .filter(isExpensiveBook)
+                .toList();
     }
 
     /**
