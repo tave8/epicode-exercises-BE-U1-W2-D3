@@ -28,17 +28,47 @@ public class Main {
         List<Order> ordersWithBabyProducts = getOrdersWithBabyProducts(orders);
         // exercise 3
         List<Product> discountedBoyProducts = getDiscountedBoyProducts(products);
+        // exercise 4
+        // List<Product> productsBetweenDateRangeOfTier2Customers = getProductsBetweenDateRangeOfTier2Customers(orders);
 
         System.out.println("---- EXPENSIVE BOOKS -----");
         System.out.println(expensiveBooks);
 
+        System.out.println();
         System.out.println("---- ORDERS WITH BABY PRODUCTS");
         System.out.println(ordersWithBabyProducts);
 
+        System.out.println();
         System.out.println("---- DISCOUNTED BOY PRODUCTS ");
         System.out.println(discountedBoyProducts);
+
+        System.out.println();
+        // System.out.println("---- PRODUCTS ORDERED BETWEEN DATE RANGE, ORDERED BY TIER 2 CUSTOMERS");
+        // System.out.println(productsBetweenDateRangeOfTier2Customers);
     }
 
+    /**
+     * Exercise 4
+     */
+    // static List<Product> getProductsBetweenDateRangeOfTier2Customers(List<Order> orders) {
+    //     LocalDate startDate = LocalDate.of(2026, 3, 18);
+    //     LocalDate endDate = LocalDate.of(2026, 5, 18);
+    //     // predicates
+    //     Predicate<Order> isOrderAfterStartDate = order -> order.getOrderDate().isAfter(startDate);
+    //     Predicate<Order> isOrderBeforeEndDate = order -> order.getOrderDate().isBefore(endDate);
+    //     Predicate<Order> isOrderInDateRange = isOrderAfterStartDate.and(isOrderBeforeEndDate);
+    //     // streams
+    //     Stream<Order> ordersStream = orders.stream();
+    //     Stream<Order> ordersOfTier2Customers = ordersStream.filter(order -> order.getCustomer().getTier().equals(CustomerTier.TWO));
+    //     Stream<Order> ordersBetweenDateRange = ordersOfTier2Customers.filter(isOrderInDateRange);
+    //     // Stream<Product> productsOfOrders = ordersBetweenDateRange.flatMap(order -> order.getProducts());
+    //     //     
+    //
+    // }
+
+    /**
+     * Exercise 3
+     */
     static List<Product> getDiscountedBoyProducts(List<Product> products) {
         Stream<Product> productsStream = products.stream();
         Stream<Product> boysProducts = productsStream.filter(product -> product.getCategory().equals(ProductCategory.BOY));
@@ -56,6 +86,9 @@ public class Main {
         return discountedBoysProducts.toList();
     }
 
+    /**
+     * Exercise 2
+     */
     static List<Order> getOrdersWithBabyProducts(List<Order> orders) {
         Stream<Order> ordersStream = orders.stream();
         Predicate<Product> productIsBabyProduct = product -> product.getCategory().equals(ProductCategory.BABY);
@@ -71,6 +104,9 @@ public class Main {
         return ordersWithAtLeastOneBabyProduct.toList();
     }
 
+    /**
+     * Exercise 1
+     */
     static List<Product> getExpensiveBooks(List<Product> products) {
         Stream<Product> productsStream = products.stream();
         Stream<Product> books = productsStream.filter(product -> product.getCategory().equals(ProductCategory.BOOK));
@@ -97,10 +133,14 @@ public class Main {
         // ***** CUSTOMERS
         Customer customer1 = new Customer(1, "Giuseppe", CustomerTier.ONE);
         Customer customer2 = new Customer(2, "Maria", CustomerTier.ONE);
+        Customer customer3 = new Customer(3, "Giovanna", CustomerTier.TWO);
+        Customer customer4 = new Customer(4, "Mariello", CustomerTier.TWO);
 
         // ***** ORDERS
         Order order1 = new Order(1, customer1, OrderStatus.DELIVERED);
         Order order2 = new Order(2, customer1, OrderStatus.SHIPPED);
+        Order order3 = new Order(3, customer3, OrderStatus.SHIPPED);
+        Order order4 = new Order(4, customer4, OrderStatus.SHIPPED);
 
         // ***** EDIT ENTITY RELATIONSHIPS
         order1.addProduct(product4);
@@ -117,13 +157,17 @@ public class Main {
         // customers
         List<Customer> customers = List.of(
                 customer1,
-                customer2
+                customer2,
+                customer3,
+                customer4
         );
 
         // orders
         List<Order> orders = List.of(
                 order1,
-                order2
+                order2,
+                order3,
+                order4
         );
 
         return Map.of(
